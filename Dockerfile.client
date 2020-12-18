@@ -1,0 +1,22 @@
+FROM golang:alpine AS build
+
+RUN apk add git protobuf
+RUN go get -u google.golang.org/grpc
+RUN go get -u github.com/golang/protobuf/protoc-gen-go
+RUN mkdir -p /go/src/haproxy.com/grpc/rolldice
+
+# Copy files to container
+WORKDIR /go/src/app
+COPY . .
+
+# Build proto file
+RUN protoc --go_out=plugins=grpc:/go/src *.proto
+
+# Build app
+RUN CGO_ENABLED=0 go build -o /output/client ./client.go
+
+
+FROM golang:alpine
+WORKDIR /app
+COPY --from=build /output/client .
+ENTRYPOINT ["./client"]

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package = "haproxy.com/grpc/rolldice";
+
+message RollDiceRequest {
+    int32 numberOfDice = 1;
+}
+
+message RollDiceResponse {
+    repeated int32 rolls = 1 [packed=true];
+}
+
+service RollDiceService {
+    rpc RollDice(RollDiceRequest) returns (RollDiceResponse) {}
+}
